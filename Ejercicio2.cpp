@@ -1,6 +1,5 @@
 #include<bits/stdc++.h>
 using namespace std;
-
 unsigned t0, t1;
 
 void multiplication(double A[500][500],int rowsA,int columnsA,double B[500][500],int rowsB,int columnsB,double C[500][500] ){
