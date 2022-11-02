@@ -16,13 +16,12 @@ void *Thread_work(void* rank);
 int main(int argc, char* argv[]) {
 
    //X,Y valores de los puntos a graficar
-   double valoresX[NUM_PUNTOS]={1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0};
-   double valoresY[NUM_PUNTOS]={0, 0, 0.1, 1.2 ,2.6 , 3.9 ,7.8};
-   FILE * archivoPuntos = fopen("puntosGraficar.txt", "w");
+   //double valoresX[NUM_PUNTOS]={1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0};
+   //double valoresY[NUM_PUNTOS]={0, 0, 0.1, 1.2 ,2.6 , 3.9 ,7.8};
+   //FILE * archivoPuntos = fopen("puntosGraficar.txt", "w");
    /*Guardar los puntos x,y en el archivo de texto creado y abierto previamente*/
-    for (int i=0;i<NUM_PUNTOS;i++){
-      fprintf(archivoPuntos, "%lf %lf n", valoresX[i], valoresY[i]);
-   }
+   /* for (int i=0;i<NUM_PUNTOS;i++){
+      fprintf(archivoPuntos, "%lf %lf n", valoresX[i], valoresY[i]);}*/
    fclose(archivoPuntos);
    FILE *fp=popen("gnuplot -persist","w");fclose(fp);
    long       thread, i;
