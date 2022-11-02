@@ -1,51 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <omp.h>
-#include <stdio.h>
-#ifdef DEBUG
-const int RMAX = 100;
-#else
-const int RMAX = 10000000;
-#endif
 
-int thread_count;
+const int RMAX = 100;
 
 void Usage(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
 void Generate_list(int a[], int n);
 void Print_list(int a[], int n, char* title);
 void Read_list(int a[], int n);
-void Odd_even(int a[], int n);
+void Odd_even_sort(int a[], int n);
 
 /*-----------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    int  n;
    char g_i;
    int* a;
-   double start, finish;
-   //int v[]={100,200,400,600,800,1000,1200,1400};
+
    Get_args(argc, argv, &n, &g_i);
-   a = malloc(n*sizeof(int));
-   
+   a = (int*) malloc(n*sizeof(int));
    if (g_i == 'g') {
       Generate_list(a, n);
-#     ifdef DEBUG
       Print_list(a, n, "Before sort");
-#     endif
    } else {
       Read_list(a, n);
    }
 
-   start = omp_get_wtime();
-   Odd_even(a, n);
-   finish = omp_get_wtime();
+   Odd_even_sort(a, n);
 
-#  ifdef DEBUG
    Print_list(a, n, "After sort");
-#  endif
    
-   printf("Elapsed time = %e seconds\n", finish - start);
-
    free(a);
    return 0;
 }  /* main */
@@ -53,20 +36,21 @@ int main(int argc, char* argv[]) {
 
 /*-----------------------------------------------------------------*/
 void Usage(char* prog_name) {
-   fprintf(stderr, "usage:   %s <thread count> <n> <g|i>\n", prog_name);
+   fprintf(stderr, "usage:   %s <n> <g|i>\n", prog_name);
    fprintf(stderr, "   n:   number of elements in list\n");
    fprintf(stderr, "  'g':  generate list using a random number generator\n");
    fprintf(stderr, "  'i':  user input list\n");
 }  /* Usage */
 
+
+/*-----------------------------------------------------------------*/
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
-   if (argc != 4 ) {
+   if (argc != 3 ) {
       Usage(argv[0]);
       exit(0);
    }
-   thread_count = strtol(argv[1], NULL, 10);
-   *n_p = strtol(argv[2], NULL, 10);
-   *g_i_p = argv[3][0];
+   *n_p = atoi(argv[1]);
+   *g_i_p = argv[2][0];
 
    if (*n_p <= 0 || (*g_i_p != 'g' && *g_i_p != 'i') ) {
       Usage(argv[0]);
@@ -75,15 +59,17 @@ void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
 }  /* Get_args */
 
 
+/*-----------------------------------------------------------------*/
 void Generate_list(int a[], int n) {
    int i;
 
-   srandom(1);
+   srandom(0);
    for (i = 0; i < n; i++)
       a[i] = random() % RMAX;
 }  /* Generate_list */
 
 
+/*-----------------------------------------------------------------*/
 void Print_list(int a[], int n, char* title) {
    int i;
 
@@ -94,6 +80,7 @@ void Print_list(int a[], int n, char* title) {
 }  /* Print_list */
 
 
+/*-----------------------------------------------------------------*/
 void Read_list(int a[], int n) {
    int i;
 
@@ -103,36 +90,30 @@ void Read_list(int a[], int n) {
 }  /* Read_list */
 
 
-void Odd_even(int a[], int n) {
-   int phase, i, tmp;
-#  ifdef DEBUG
-   char title[100];
-#  endif
-
-   for (phase = 0; phase < n; phase++) {
-      if (phase % 2 == 0)
-#        pragma omp parallel for num_threads(thread_count) \
-            default(none) shared(a, n) private(i, tmp)
-         for (i = 1; i < n; i += 2) {
+/*-----------------------------------------------------------------*/
+void Odd_even_sort(int a[] ,int n) {
+   int phase, i, temp;
+   for (phase = 0; phase < n; phase++)
+      if (phase % 2 == 0) { /* Even phase */
+        printf("BUCLE 1\n\n");
+         for (i = 1; i < n; i += 2) 
+         
             if (a[i-1] > a[i]) {
-               tmp = a[i-1];
-               a[i-1] = a[i];
-               a[i] = tmp;
+               temp = a[i];
+               a[i] = a[i-1];
+               a[i-1] = temp;
+               printf("phase %d\n", phase);
+               printf("%d \n", a[i-1]);
             }
-         }
-      else
-#        pragma omp parallel for num_threads(thread_count) \
-            default(none) shared(a, n) private(i, tmp)
-         for (i = 1; i < n-1; i += 2) {
+      } else { /* Odd phase */
+        printf("BUCLE 2\n\n");
+         for (i = 1; i < n-1; i += 2)
             if (a[i] > a[i+1]) {
-               tmp = a[i+1];
-               a[i+1] = a[i];
-               a[i] = tmp;
+               temp = a[i];
+               a[i] = a[i+1];
+               a[i+1] = temp;
+               printf("phase %d\n", phase);
+               printf("%d \n", a[i-1]);
             }
-         }
-#     ifdef DEBUG
-      sprintf(title, "After phase %d", phase);
-      Print_list(a, n, title);
-#     endif
-   }
-}  /* Odd_even */
+      }
+}  /* Odd_even_sort */
