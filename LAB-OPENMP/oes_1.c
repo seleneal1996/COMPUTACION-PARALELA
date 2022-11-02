@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<bits/stdc++.h>
+using namespace std;
 #include <omp.h>
 
 #ifdef DEBUG
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
    char g_i;
    int* a;
    double start, finish;
-
+   vector<int> v={100,200,400,600,800,1000,1200,1400}
    Get_args(argc, argv, &n, &g_i);
    a = malloc(n*sizeof(int));
    if (g_i == 'g') {
