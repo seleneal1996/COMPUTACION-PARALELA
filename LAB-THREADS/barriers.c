@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
    /*Guardar los puntos x,y en el archivo de texto creado y abierto previamente*/
    /* for (int i=0;i<NUM_PUNTOS;i++){
       fprintf(archivoPuntos, "%lf %lf n", valoresX[i], valoresY[i]);}*/
-   fclose(archivoPuntos);
-   FILE *fp=popen("gnuplot -persist","w");fclose(fp);
+   //fclose(archivoPuntos);
+   //FILE *fp=popen("gnuplot -persist","w");fclose(fp);
    long       thread, i;
    pthread_t* thread_handles; 
    double start, finish;
@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
    }
    GET_TIME(finish);
 
-   fprintf(fp,"plot \"puntosGraficar.txt\" with lines\n");
-   fclose(fp);
+   //fprintf(fp,"plot \"puntosGraficar.txt\" with lines\n");
+   //fclose(fp);
    printf("Elapsed time = %e seconds\n", finish-start);
 
    pthread_mutex_destroy(&barrier_mutex);
