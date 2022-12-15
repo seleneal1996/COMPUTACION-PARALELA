@@ -4,6 +4,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include <iostream>
+
 #define BLUR_SIZE 7
 #define R 0
 #define G 1
