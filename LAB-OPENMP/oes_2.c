@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include <stdio.h>
+
 #ifdef DEBUG
 const int RMAX = 100;
 #else
@@ -23,10 +23,9 @@ int main(int argc, char* argv[]) {
    char g_i;
    int* a;
    double start, finish;
-   //int v[]={100,200,400,600,800,1000,1200,1400};
+
    Get_args(argc, argv, &n, &g_i);
    a = malloc(n*sizeof(int));
-   
    if (g_i == 'g') {
       Generate_list(a, n);
 #     ifdef DEBUG
@@ -51,13 +50,17 @@ int main(int argc, char* argv[]) {
 }  /* main */
 
 
-/*-----------------------------------------------------------------*/
+//-----------------------------------------------------------------
+
 void Usage(char* prog_name) {
    fprintf(stderr, "usage:   %s <thread count> <n> <g|i>\n", prog_name);
    fprintf(stderr, "   n:   number of elements in list\n");
    fprintf(stderr, "  'g':  generate list using a random number generator\n");
    fprintf(stderr, "  'i':  user input list\n");
 }  /* Usage */
+
+
+//-----------------------------------------------------------------
 
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
    if (argc != 4 ) {
@@ -75,6 +78,8 @@ void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
 }  /* Get_args */
 
 
+//-----------------------------------------------------------------
+
 void Generate_list(int a[], int n) {
    int i;
 
@@ -84,6 +89,11 @@ void Generate_list(int a[], int n) {
 }  /* Generate_list */
 
 
+/*-----------------------------------------------------------------
+ * Function:  Print_list
+ * Purpose:   Print the elements in the list
+ * In args:   a, n
+ */
 void Print_list(int a[], int n, char* title) {
    int i;
 
@@ -94,6 +104,12 @@ void Print_list(int a[], int n, char* title) {
 }  /* Print_list */
 
 
+/*-----------------------------------------------------------------
+ * Function:  Read_list
+ * Purpose:   Read elements of list from stdin
+ * In args:   n
+ * Out args:  a
+ */
 void Read_list(int a[], int n) {
    int i;
 
@@ -103,16 +119,15 @@ void Read_list(int a[], int n) {
 }  /* Read_list */
 
 
+/*-----------------------------------------------------------------*/
 void Odd_even(int a[], int n) {
    int phase, i, tmp;
-#  ifdef DEBUG
-   char title[100];
-#  endif
 
+#  pragma omp parallel num_threads(thread_count) \
+      default(none) shared(a, n) private(i, tmp, phase)
    for (phase = 0; phase < n; phase++) {
       if (phase % 2 == 0)
-#        pragma omp parallel for num_threads(thread_count) \
-            default(none) shared(a, n) private(i, tmp)
+#        pragma omp for 
          for (i = 1; i < n; i += 2) {
             if (a[i-1] > a[i]) {
                tmp = a[i-1];
@@ -121,8 +136,7 @@ void Odd_even(int a[], int n) {
             }
          }
       else
-#        pragma omp parallel for num_threads(thread_count) \
-            default(none) shared(a, n) private(i, tmp)
+#        pragma omp for 
          for (i = 1; i < n-1; i += 2) {
             if (a[i] > a[i+1]) {
                tmp = a[i+1];
@@ -130,9 +144,5 @@ void Odd_even(int a[], int n) {
                a[i] = tmp;
             }
          }
-#     ifdef DEBUG
-      sprintf(title, "After phase %d", phase);
-      Print_list(a, n, title);
-#     endif
    }
 }  /* Odd_even */
